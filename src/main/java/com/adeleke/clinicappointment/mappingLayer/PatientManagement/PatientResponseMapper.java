@@ -2,27 +2,20 @@ package com.adeleke.clinicappointment.mappingLayer.PatientManagement;
 
 import com.adeleke.clinicappointment.DataLayer.PatientManegement.Patient;
 
-import com.adeleke.clinicappointment.DataLayer.PatientManegement.PatientAddress;
-import com.adeleke.clinicappointment.DataLayer.PatientManegement.PatientContactInfo;
-import com.adeleke.clinicappointment.PresentationLayer.PatientManagement.PatientController;
+
 import com.adeleke.clinicappointment.PresentationLayer.PatientManagement.PatientResponseModel;
 
 import org.mapstruct.*;
-import org.springframework.hateoas.Link;
-
-
-import java.util.Date;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 @Mapper(componentModel = "spring")
 public interface PatientResponseMapper {
 
     @Mappings({
             @Mapping(
-                    source = "patientId.patientId)",
+                    source = "patientId.patientId",
                     target = "patientId"
             ),
             @Mapping(
