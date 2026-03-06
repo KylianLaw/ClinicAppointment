@@ -41,15 +41,18 @@ public class ClinicServiceImpl implements ClinicService {
 
     @Override
     public ClinicResponseModel getClinicById(String clinicId) {
-        Clinic clinic = clinicRepository.findByClinicId(clinicId);
-        if(clinic == null) {
+        Clinic clinic = clinicRepository.findByClinicId_ClinicId(clinicId);
+
+        if (clinic == null) {
             throw new NotFoundException("Clinic with ID " + clinicId + " not found");
         }
-        return clinicResponseMapper.toClinicResponse(clinic);}
+
+        return clinicResponseMapper.toClinicResponse(clinic);
+    }
 
     @Override
     public ClinicResponseModel updateClinic(String clinicId, ClinicRequestModel requestModel) {
-        Clinic clinic = clinicRepository.findByClinicId(clinicId);
+        Clinic clinic = clinicRepository.findByClinicId_ClinicId(clinicId);
         if(clinic == null) {
             throw new NotFoundException("Clinic with ID " + clinicId + " not found");
         }
@@ -66,7 +69,7 @@ public class ClinicServiceImpl implements ClinicService {
 
     @Override
     public void deleteClinic(String clinicId) {
-        Clinic clinic = clinicRepository.findByClinicId(clinicId);
+        Clinic clinic = clinicRepository.findByClinicId_ClinicId(clinicId);
         if (clinic == null) {
             throw new NotFoundException("Clinic with ID " + clinicId + " not found");
         }

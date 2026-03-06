@@ -1,7 +1,9 @@
 ------------------------------------------------
 -- PATIENTS
 ------------------------------------------------
-
+DELETE FROM Clinics;
+DELETE FROM Doctors;
+DELETE FROM Patients;
 INSERT INTO Patients (patient_id, patient_full_name, birth_date, street, city, postal_code, email, phone_number)
 VALUES ('PAT-001', 'John Smith', '1985-03-15', '123 Maple St', 'Montreal', 'H2X1A1', 'john.smith@email.com', '514-555-1001');
 

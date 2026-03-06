@@ -1,4 +1,4 @@
-CREATE TABLE Patients (
+CREATE TABLE IF NOT EXISTS Patients (
                           id INT AUTO_INCREMENT PRIMARY KEY,
 
     -- Identifier
