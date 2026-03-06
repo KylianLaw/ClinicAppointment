@@ -1,0 +1,352 @@
+@startuml
+hide circle
+top to bottom direction
+
+!define ENTITY(entityName) class entityName << Entity >>
+!define AGGREGATE(aggregateName) class aggregateName << Aggregate >>
+!define AGGREGATE_ROOT(aggregateRootName) class aggregateRootName << Aggregate Root >>
+!define AGGREGATE_ROOT_ENTITY(aggregateRootEntityName) class aggregateRootEntityName << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(valueObjectName) class valueObjectName << Value Object >>
+!pragma useVerticalIf on
+skinparam dpi 350
+skinparam packageStyle rectangle
+skinparam rectangle {
+    BackgroundColor #f7f4eb
+    BorderColor Black
+}
+
+Package "Service Requester Context (Core)" <<Rectangle>> #BBDEFB {
+
+    note "This context answers: \n'What does the customer want?'" as contextNote
+
+   AGGREGATE_ROOT_ENTITY(ServiceRequest) #lightblue {
+       requestId: UUID
+       customerId: UUID
+       status: String
+       urgency: String
+       createdAt: DateTime
+       preferredDate: DateTime
+   }
+
+    VALUE_OBJECT(ServiceRequestIdentifier) #Bisque {
+        requestId: UUID
+    }
+
+    VALUE_OBJECT(ProblemDescription) #Bisque {
+        title: String
+        details: String
+        category: String
+        estimatedComplexity: String
+    }
+
+    ENTITY(Customer) #lightblue {
+        customerId: UUID
+        firstName: String
+        lastName: String
+        email: String
+        registrationDate: DateTime
+    }
+
+    VALUE_OBJECT(CustomerIdentifier) #Bisque {
+        customerId: UUID
+    }
+
+    VALUE_OBJECT(CustomerAddress) #Bisque {
+        street: String
+        city: String
+        province: String
+        postalCode: String
+        country: String
+    }
+
+    VALUE_OBJECT(CustomerPhoneNumber) #Bisque {
+        type: String
+        number: String
+    }
+
+    VALUE_OBJECT(Preferences) #Bisque {
+        maxBudget: Money
+        preferredHandymanGender: String
+        languagePreference: String
+        requiresInsurance: Boolean
+    }
+
+    VALUE_OBJECT(SearchCriteria) #Bisque {
+        serviceCategory: String
+        maxDistance: Integer
+        minRating: Decimal
+        availabilityWindow: DateRange
+    }
+
+    VALUE_OBJECT(Money) #Bisque {
+        amount: Decimal
+        currency: String
+    }
+
+    VALUE_OBJECT(DateRange) #Bisque {
+        startDate: DateTime
+        endDate: DateTime
+    }
+
+    ServiceRequest --> ServiceRequestIdentifier
+    ServiceRequest o--> "1" ProblemDescription
+    ServiceRequest o--> "1" Preferences
+    ServiceRequest o--> "1" SearchCriteria
+    ServiceRequest --> CustomerIdentifier
+
+    Customer --> CustomerIdentifier
+    Customer o--> "1" CustomerAddress
+    Customer o-- "1..*" CustomerPhoneNumber
+
+    note on link
+        A customer can have multiple
+        phone numbers (mobile, home, work)
+    end note
+
+    Preferences o--> "1" Money
+    SearchCriteria o--> "1" DateRange
+}
+
+Package "Handyman Profile Context (Supporting)" <<Rectangle>> #BBDEFB {
+
+    AGGREGATE_ROOT_ENTITY(HandymanProfile) #lightblue {
+        handymanId: UUID
+        name: String
+        email: String
+        isActive: Boolean
+        isVerified: Boolean
+    }
+
+    VALUE_OBJECT(SkillSet) #Bisque {
+        skillName: String
+        proficiencyLevel: Enum
+    }
+
+    VALUE_OBJECT(WorkZone) #Bisque {
+        city: String
+        province: String
+        maxTravelDistance: Float
+    }
+
+    VALUE_OBJECT(AvailabilityCalendar) #Bisque {
+        lastUpdated: DateTime
+    }
+
+    VALUE_OBJECT(CalendarEntry) #Bisque {
+        dayOfWeek: String
+        startTime: DateTime
+        endTime: DateTime
+    }
+    VALUE_OBJECT(HandymanIdentifier) #Bisque{
+        HandyId : UUID
+
+    }
+VALUE_OBJECT(BackgroundCheckIdentifier) #Bisque{
+
+BackgroundCheckId: UUID
+}
+    AGGREGATE_ROOT_ENTITY(BackgroundCheck) #lightblue {
+        checkId: UUID
+        handymanId: UUID
+        status: Enum
+        performedDate: DateTime
+    }
+BackgroundCheck --> HandymanIdentifier
+HandymanProfile --> HandymanIdentifier
+    HandymanProfile o--> "0..*" SkillSet
+    HandymanProfile o--> "1" WorkZone
+    HandymanProfile o--> "1" AvailabilityCalendar
+    AvailabilityCalendar *--> "0..*" CalendarEntry
+HandymanProfile --> BackgroundCheckIdentifier
+'    HandymanProfile "1" -- "0..1" BackgroundCheck : verified by >
+BackgroundCheck --> BackgroundCheckIdentifier
+    note right of HandymanProfile
+        **Invariants:**
+        1. Cannot be marked Verified unless
+           BackgroundCheck Status is Passed[cite: 44].
+        2. Cannot be Active unless Verified[cite: 45].
+    end note
+}
+
+Package "Job Booking Context (Core)" <<Rectangle>> #BBDEFB {
+
+    AGGREGATE_ROOT_ENTITY(Job) #lightblue {
+        jobId: UUID
+        status: Enum
+        customerId: UUID
+        handymanId: UUID
+        serviceRequestId: UUID
+    }
+    VALUE_OBJECT(JobIdentifier) #Bisque{
+    jobId: UUID
+    }
+Job --> JobIdentifier
+    VALUE_OBJECT(Schedule) #Bisque {
+        scheduledDate: Date
+        timeSlot: String
+        startTime: DateTime
+        endTime: DateTime
+        estimatedDuration: Integer
+    }
+
+    VALUE_OBJECT(JobLocation) #Bisque {
+        street: String
+        city: String
+        postalCode: String
+    }
+
+    ENTITY(JobTask) #lightblue {
+        taskId: UUID
+        description: String
+        serviceCategory: String
+    }
+VALUE_OBJECT(JobTaskIdentifier) #Bisque{
+JobTaskId: UUID
+}
+VALUE_OBJECT(AppointmentIdentifier) #Bisque{
+appId: UUID
+}
+Appointment --> AppointmentIdentifier
+JobTask --> JobTaskIdentifier
+    AGGREGATE_ROOT_ENTITY(Appointment) #lightblue {
+        appointmentId: UUID
+        jobId: UUID
+        confirmedAt: DateTime
+    }
+
+    Job o--> "1" Schedule
+    Job o--> "1" JobLocation
+    Job --> JobTaskIdentifier
+'    Job "1" -- "0..1" Appointment : results in >
+Job --> AppointmentIdentifier
+    note right of Job
+        **Invariants:**
+        1. No overlapping schedules for
+           the same Handyman[cite: 57].
+        2. Cannot be scheduled/in-progress
+           without an assigned Handyman[cite: 58].
+    end note
+}
+
+Package "Review & Reputation Context (Supporting)" <<Rectangle>> #BBDEFB {
+
+    AGGREGATE_ROOT_ENTITY(Review) #lightblue {
+        reviewId: UUID
+        jobId: UUID
+        customerId: UUID
+        handymanId: UUID
+        createdAt: DateTime
+        isVerified: Boolean
+        wouldRecommend: Boolean
+    }
+
+    VALUE_OBJECT(Rating) #Bisque {
+        overallScore: Integer
+        professionalismScore: Integer
+        qualityScore: Integer
+        punctualityScore: Integer
+    }
+
+    VALUE_OBJECT(Feedback) #Bisque {
+        comment: String
+    }
+
+    VALUE_OBJECT(ReviewResponse) #Bisque {
+        responseText: String
+        respondedAt: DateTime
+    }
+
+    AGGREGATE_ROOT_ENTITY(ReputationScore) #lightblue {
+        reputationId: UUID
+        handymanId: UUID
+        totalReviews: Integer
+        averageRating: Decimal
+    }
+
+    VALUE_OBJECT(VerifiedBadge) #Bisque {
+        badgeType: String
+        earnedDate: Date
+    }
+VALUE_OBJECT(reputationIdentifier) #Bisque{
+repId: UUID
+}
+VALUE_OBJECT(ReviewIdentifier) #Bisque{
+reviewId: UUID
+
+}
+ReputationScore --> reputationIdentifier
+    Review o--> "1" Rating
+    Review o--> "1" Feedback
+    Review o--> "0..1" ReviewResponse
+    ReputationScore o--> "0..*" VerifiedBadge
+ReputationScore --> HandymanIdentifier
+Review --> JobIdentifier
+Review --> CustomerIdentifier
+Review --> HandymanIdentifier
+Review --> ReviewIdentifier
+    note left of Review
+        **Invariants:**
+        1. Cannot recommend without a rating[cite: 70].
+        2. Cannot post without a comment[cite: 71].
+    end note
+}
+Package "Payment & Billing Context (Generic)" <<Rectangle>> #BBDEFB {
+
+    AGGREGATE_ROOT_ENTITY(Invoice) #lightblue {
+        invoiceId: UUID
+        invoiceNumber: String
+        issueDate: DateTime
+        dueDate: DateTime
+        totalAmount: Decimal
+    }
+
+    VALUE_OBJECT(LineItem) #Bisque {
+        description: String
+        quantity: Integer
+        unitPrice: Decimal
+        subtotal: Decimal
+    }
+
+    AGGREGATE_ROOT_ENTITY(Escrow) #lightblue {
+        escrowId: UUID
+        jobId: UUID
+        heldAmount: Decimal
+        releaseDate: DateTime
+    }
+
+    ENTITY(Transaction) #lightblue {
+        transactionId: UUID
+        date: DateTime
+        status: String
+    }
+VALUE_OBJECT(TransactionIdentifier) #Bisque{
+        transactionId: UUID
+
+}
+Transaction --> TransactionIdentifier
+    ENTITY(Payout) #lightblue {
+        payoutId: UUID
+        netAmount: Decimal
+        fee: Decimal
+    }
+VALUE_OBJECT(PayoutIdentifier) #Bisque{
+        payoutId: UUID
+
+
+}
+Payout --> PayoutIdentifier
+    Invoice *--> "1..*" LineItem
+    Escrow --> TransactionIdentifier
+    Escrow  --> PayoutIdentifier
+
+    note right of Invoice
+        **Invariant:** Must have at least
+        one LineItem to be issued[cite: 83].
+    end note
+
+    note left of Escrow
+        **Invariant:** Cannot release funds
+        unless a successful Transaction exists[cite: 84].
+    end note
+}
+@enduml

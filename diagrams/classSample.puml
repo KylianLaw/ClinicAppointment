@@ -1,0 +1,110 @@
+@startuml
+hide circle
+top to bottom direction
+
+!define ENTITY(entityName) class entityName << Entity >>
+!define AGGREGATE(aggregateName) class aggregateName << Aggregate >>
+!define AGGREGATE_ROOT(aggregateRootName) class aggregateRootName << Aggregate Root >>
+!define AGGREGATE_ROOT_ENTITY(aggregateRootEntityName) class aggregateRootEntityName << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(valueObjectName) class valueObjectName << Value Object >>
+!pragma useVerticalIf on
+skinparam dpi 350
+skinparam packageStyle rectangle
+skinparam rectangle {
+    BackgroundColor #f7f4eb
+    BorderColor Black
+}
+
+Package "Service Requester Context (Core)" <<Rectangle>> #BBDEFB {
+
+    note "This context answers: \n'What does the customer want?'" as contextNote
+
+   AGGREGATE_ROOT_ENTITY(ServiceRequest) #lightblue {
+       requestId: UUID
+       customerId: UUID
+       status: String
+       urgency: String
+       createdAt: DateTime
+       preferredDate: DateTime
+   }
+
+    VALUE_OBJECT(ServiceRequestIdentifier) #Bisque {
+        requestId: UUID
+    }
+
+    VALUE_OBJECT(ProblemDescription) #Bisque {
+        title: String
+        details: String
+        category: String
+        estimatedComplexity: String
+    }
+
+    ENTITY(Customer) #lightblue {
+        customerId: UUID
+        firstName: String
+        lastName: String
+        email: String
+        registrationDate: DateTime
+    }
+
+    VALUE_OBJECT(CustomerIdentifier) #Bisque {
+        customerId: UUID
+    }
+
+    VALUE_OBJECT(CustomerAddress) #Bisque {
+        street: String
+        city: String
+        province: String
+        postalCode: String
+        country: String
+    }
+
+    VALUE_OBJECT(CustomerPhoneNumber) #Bisque {
+        type: String
+        number: String
+    }
+
+    VALUE_OBJECT(Preferences) #Bisque {
+        maxBudget: Money
+        preferredHandymanGender: String
+        languagePreference: String
+        requiresInsurance: Boolean
+    }
+
+    VALUE_OBJECT(SearchCriteria) #Bisque {
+        serviceCategory: String
+        maxDistance: Integer
+        minRating: Decimal
+        availabilityWindow: DateRange
+    }
+
+    VALUE_OBJECT(Money) #Bisque {
+        amount: Decimal
+        currency: String
+    }
+
+    VALUE_OBJECT(DateRange) #Bisque {
+        startDate: DateTime
+        endDate: DateTime
+    }
+
+    ServiceRequest --> ServiceRequestIdentifier
+    ServiceRequest o--> "1" ProblemDescription
+    ServiceRequest o--> "1" Preferences
+    ServiceRequest o--> "1" SearchCriteria
+    ServiceRequest --> CustomerIdentifier
+
+    Customer --> CustomerIdentifier
+    Customer o--> "1" CustomerAddress
+    Customer o-- "1..*" CustomerPhoneNumber
+
+    note on link
+        A customer can have multiple
+        phone numbers (mobile, home, work)
+    end note
+
+    Preferences o--> "1" Money
+    SearchCriteria o--> "1" DateRange
+}
+
+@enduml

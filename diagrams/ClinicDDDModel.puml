@@ -1,0 +1,204 @@
+@startuml
+title Clinic Appointment Booking - DDD Domain Model
+
+hide circle
+top to bottom direction
+scale 0.2
+
+!define ENTITY(entityName) class entityName << Entity >>
+!define ENUM(enumName) class enumName << Enum >>
+!define AGGREGATE_ROOT(aggregateRootName) class aggregateRootName << Aggregate Root >>
+!define VALUE_OBJECT(valueObjectName) class valueObjectName << Value Object >>
+
+skinparam dpi 350
+skinparam packageStyle rectangle
+skinparam rectangle {
+    BackgroundColor #f7f4eb
+    BorderColor Black
+}
+
+skinparam class {
+    BorderColor Black
+    BackgroundColor White
+}
+
+rectangle "Clinic Appointment Booking Context" as ClinicBC #line.dashed {
+
+    package "Patient Management Sub-Domain (SUPPORTING)" as PatientSD #ADD8E6 {
+        AGGREGATE_ROOT(Patient) #87CEEB {
+            patientId: UUID
+            firstName: String
+            lastName: String
+            birthDate: Date
+        }
+
+        VALUE_OBJECT(PatientIdentifier) #F5F5F5 {
+            patientId: UUID
+        }
+
+        VALUE_OBJECT(PatientAddress) #F5F5F5 {
+            street: String
+            city: String
+            postalCode: String
+        }
+
+        VALUE_OBJECT(PatientContactInfo) #F5F5F5 {
+            email: String
+            phoneNumber: String
+        }
+
+        Patient "1" -- "1" PatientAddress
+        Patient "1" -- "1" PatientContactInfo
+    }
+
+    package "Doctor Management Sub-Domain (SUPPORTING)" as DoctorSD #C1E1C1 {
+        AGGREGATE_ROOT(Doctor) #90EE90 {
+            doctorId: UUID
+            firstName: String
+            lastName: String
+            specialty: SpecialtyEnum
+        }
+
+        VALUE_OBJECT(DoctorIdentifier) #F5F5F5 {
+            doctorId: UUID
+        }
+
+        VALUE_OBJECT(DoctorContactInfo) #F5F5F5 {
+            email: String
+            phoneNumber: String
+        }
+
+        ENUM(SpecialtyEnum) #E6E6E6 {
+            PEDIATRICS
+            DERMATOLOGY
+            PSYCHIATRY
+            CARDIOLOGY
+            ORTHOPEDICS
+            NEUROLOGY
+            FAMILY_MEDICINE
+        }
+
+        Doctor "1" -- "1" DoctorContactInfo
+    }
+
+    package "Clinic Management Sub-Domain (SUPPORTING)" as ClinicSD #FFD8A8 {
+        AGGREGATE_ROOT(Clinic) #FFB347 {
+            clinicId: UUID
+            clinicName: String
+        }
+
+        VALUE_OBJECT(ClinicIdentifier) #F5F5F5 {
+            clinicId: UUID
+        }
+
+        VALUE_OBJECT(ClinicAddress) #F5F5F5 {
+            street: String
+            city: String
+            postalCode: String
+        }
+
+        Clinic "1" -- "1" ClinicAddress
+    }
+package "Appointment Management Sub-Domain (CORE)" as AppointmentSD #E6D9FF {
+
+    ' =========================
+    ' AGGREGATE 1 : Appointment
+    ' =========================
+
+    AGGREGATE_ROOT(Appointment) #CDB4FF {
+        appointmentId: UUID
+        patientId: UUID
+        doctorId: UUID
+        clinicId: UUID
+        slotId: UUID
+        appointmentDateTime: LocalDateTime
+        appointmentStatus: AppointmentStatusEnum
+    }
+
+    VALUE_OBJECT(AppointmentIdentifier) #F5F5F5 {
+        appointmentId: UUID
+    }
+
+    ENUM(AppointmentStatusEnum) #E6E6E6 {
+        SCHEDULED
+        CANCELLED
+        COMPLETED
+    }
+
+    Appointment --> AppointmentStatusEnum
+    Appointment --> AppointmentIdentifier
+
+    ' references to other aggregates via identifiers only
+    Appointment -d-> PatientIdentifier
+    Appointment -d-> DoctorIdentifier
+    Appointment -d-> ClinicIdentifier
+    Appointment -d-> AppointmentSlotIdentifier : "References slot"
+
+
+    note right of Appointment #FFF3B0
+    Invariants:
+    - Appointment cannot exist without valid slotId
+    - Appointment cannot be scheduled in the past
+    - Patient cannot have overlapping appointments
+    end note
+
+
+
+    ' =========================
+    ' AGGREGATE 2 : AppointmentSlot
+    ' =========================
+
+    AGGREGATE_ROOT(AppointmentSlot) #CDB4FF {
+        slotId: UUID
+        doctorId: UUID
+        clinicId: UUID
+        timeRange: TimeRange
+        status: SlotStatusEnum
+    }
+
+    VALUE_OBJECT(AppointmentSlotIdentifier) #F5F5F5 {
+        slotId: UUID
+    }
+
+    VALUE_OBJECT(TimeRange) #F5F5F5 {
+        startTime: LocalDateTime
+        endTime: LocalDateTime
+    }
+
+    ENUM(SlotStatusEnum) #E6E6E6 {
+        AVAILABLE
+        RESERVED
+        BOOKED
+        BLOCKED
+    }
+
+    AppointmentSlot --> AppointmentSlotIdentifier
+    AppointmentSlot --> TimeRange
+    AppointmentSlot --> SlotStatusEnum
+
+    AppointmentSlot -d-> DoctorIdentifier
+    AppointmentSlot -d-> ClinicIdentifier
+
+
+    note right of AppointmentSlot #FFF3B0
+    Invariants:
+    - startTime must be before endTime
+    - Doctor cannot have overlapping slots
+    - BOOKED slot cannot become AVAILABLE again
+    - Slot cannot be double-booked
+    end note
+
+
+
+    ' =========================
+    ' CORE SUBDOMAIN RELATIONS
+    ' =========================
+
+    AppointmentSD -d-> PatientSD : "Associate appointment with patient"
+    AppointmentSD -d-> DoctorSD  : "Check doctor availability"
+    AppointmentSD -d-> ClinicSD  : "Schedule appointment at clinic"
+
+}
+
+
+@enduml

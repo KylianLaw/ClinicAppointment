@@ -1,0 +1,129 @@
+@startuml
+title Categorization Table - DDD Domain Model (Identifiers-only Relationships)
+
+hide circle
+top to bottom direction
+scale 0.2
+
+!define ENTITY(entityName) class entityName << Entity >>
+!define ENUM(enumName) class enumName << Enum >>
+!define AGGREGATE_ROOT(aggregateRootName) class aggregateRootName << Aggregate Root >>
+!define VALUE_OBJECT(valueObjectName) class valueObjectName << Value Object >>
+
+skinparam dpi 350
+skinparam packageStyle rectangle
+skinparam rectangle {
+    BackgroundColor #f7f4eb
+    BorderColor Black
+}
+
+skinparam class {
+    BorderColor Black
+    BackgroundColor White
+}
+
+rectangle "Booking Context" as ClassActivityBC #line.dashed {
+
+    package "Categorization management (SUPPORTING)" as Categorization #ADD8E6 {
+
+        AGGREGATE_ROOT(Job) #87CEEB {
+            jobId: UUID
+            status: StatusEnum
+            serviceCategory: ServiceCategoryEnum
+            customerId: UUID
+            handymanId: UUID
+            serviceRequestId: UUID
+        }
+
+        VALUE_OBJECT(JobIdentifier) #F5F5F5 {
+            jobId: UUID
+        }
+
+        ENTITY(Appointment) #90EE90 {
+            appointmentId: UUID
+            confirmedAt: DateTime
+        }
+
+        VALUE_OBJECT(AppointmentIdentifier) #F5F5F5 {
+            appointmentId: UUID
+        }
+
+        VALUE_OBJECT(JobTaskIdentifier) #F5F5F5 {
+            taskId: UUID
+        }
+
+        ENTITY(JobTask) #90EE90 {
+            taskId: UUID
+            taskDescription: String
+
+        }
+
+        VALUE_OBJECT(Schedule) #F5F5F5 {
+            scheduledDate: Date
+            timeSlot: String
+            startTime: DateTime
+            endTime: DateTime
+            estimatedDurationHours: Double
+        }
+
+        VALUE_OBJECT(JobLocation) #F5F5F5 {
+            street: String
+            city: String
+            postalCode: String
+        }
+
+        VALUE_OBJECT(Assignment) #F5F5F5 {
+            assignedAt: DateTime
+        }
+
+        VALUE_OBJECT(MatchScore) #F5F5F5 {
+            value (0-100): Double
+        }
+
+        ENUM(StatusEnum) #E6E6E6 {
+            PENDING_ASSIGNMENT
+            ASSIGNED
+            SCHEDULED
+            IN_PROGRESS
+            COMPLETED
+            CANCELLED
+        }
+
+        ENUM(ServiceCategoryEnum) #F5F5F5 {
+            PLUMBING
+            ELECTRICAL
+            CARPENTRY
+            CLEANING
+            PAINTING
+        }
+
+        ' -------------------------
+        ' Relationships (Identifiers-only)
+        ' -------------------------
+
+        ' Value Objects that conceptually belong to Job (no entity-to-entity links needed)
+        Job *-- "1" Schedule
+        Job *-- "1" JobLocation
+        Job *-- "1" Assignment
+        Job *-- "1" MatchScore
+
+        ' Entities refer to Job through JobIdentifier (not Job)
+        Appointment --> JobIdentifier : jobId
+        JobTask --> JobIdentifier : jobId
+
+        ' Appointment uses its own identifier type
+        Appointment *-- "1" AppointmentIdentifier
+
+        ' JobTask uses its own identifier type
+        JobTask *-- "1" JobTaskIdentifier
+
+        ' Job uses its identifier type (optional but consistent)
+        Job *-- "1" JobIdentifier
+
+        ' Enums used as types
+        Job --> StatusEnum
+        Job --> ServiceCategoryEnum
+    }
+}
+
+@enduml

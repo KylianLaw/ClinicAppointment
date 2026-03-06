@@ -1,0 +1,15 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title System Context Diagram for  Clinic Appointment Booking system
+
+Person(Doctor, "Doctor", "Doctor at the clinic who manages appointments and patient consultations")
+Person(Patient, "Patient", "Patient who books appointments and views medical records")
+System(ClinicSystem, "Clinic Appointment Booking System", "Allows clinic's doctor to manage appointments and patient records")
+Rel(Doctor, ClinicSystem, "Tracks appointments and patient records", "Uses")
+Rel(Patient, ClinicSystem, "Books appointments and views medical records", "Uses")
+'SHOW_LEGEND()
+@enduml
+
+
+

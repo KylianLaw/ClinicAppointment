@@ -1,0 +1,61 @@
+services:
+  clinic_application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: clinic_app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql/clinic_app
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=pwd
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=clinic_app
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./data/init.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-uuser",
+          "-ppwd",
+          "-h",
+          "localhost",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: clinic_appPHPMYADMIN
+    links:
+      - mysql
+    restart: always
+    ports:
+      - 5013:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=user
+      - PMA_PASSWORD=pwd
+
+    depends_on:
+      mysql:
+        condition: service_healthy

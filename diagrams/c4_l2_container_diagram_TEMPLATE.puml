@@ -1,0 +1,56 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!includeurl FONTAWESOME/users.puml
+
+AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro_service\night sided")
+AddElementTag("appointmentAggregate", $shape=EightSidedShape(), $bgColor="DarkOrange", $fontColor="white", $legendText="appointment aggregate")
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="white")
+AddRelTag("aggregate_root", $lineColor="red")
+
+LAYOUT_TOP_DOWN()
+SHOW_PERSON_OUTLINE()
+
+title Container Diagram for Clinic Appointment Booking System
+
+Person(patient, "Patient", "Books appointments and views medical records")
+Person(doctor, "Doctor", "Manages appointments and patient consultations")
+
+System_Boundary(clinicSystem, "Clinic Appointment System") {
+   Container(webApp, "Web Application", "JavaScript, React", "Delivers the static content and the clinic single page application to the browser")
+   Container(clinic_Appointment_Frontend, "Clinic Appointment Frontend", "JavaScript, React", "Provides the clinic appointment functionality to patients and doctors via their browsers")
+   Container(api_gateway, "API-Gateway", "Java, Spring Boot", "Provides Clinic appointment functionality via a JSON/Rest HTTPS API.")
+   Container(patient_microservice, "Patient Microservice", "Java, Spring Boot", "Provides patient registration functionality via JSON/Rest HTTPS API.", $tags="microService")
+   Container(doctor_microservice, "Doctor Microservice", "Java, Spring Boot", "Provides doctor management functionality via JSON/Rest HTTPS API.", $tags="microService")
+   Container(clinic_microservice, "Clinic Microservice", "Java, Spring Boot", "Provides clinic management functionality via JSON/Rest HTTPS API.", $tags="microService")
+   Container(appointment_microservice, "Appointment Microservice", "Java, Spring Boot", "Provides appointment management functionality via JSON/Rest HTTPS API.", $tags="appointmentAggregate")
+
+   ContainerDb(patients_db, "Patients Database", "MySQL", "Stores patient data", $tags="storage")
+   ContainerDb(doctors_db, "Doctors Database", "MySQL", "Stores doctor data", $tags="storage")
+   ContainerDb(clinics_db, "Postgres", "PostgreSQL", "Stores clinic data", $tags="storage")
+   ContainerDb(appointments_db, "Appointments Database", "MongoDB", "Stores appointment data", $tags="storage")
+
+   Rel(patient, webApp, "Visits clinicAppointment.com using", "HTTPS")
+   Rel(doctor, webApp, "Visits clinicAppointment.com using", "HTTPS")
+   Rel_R(webApp, clinic_Appointment_Frontend, "Delivers SPA to browser")
+   Rel(doctor, clinic_Appointment_Frontend, "Uses to manage appointments and view patient records")
+   Rel(patient, clinic_Appointment_Frontend, "Uses to book appointments and view medical records")
+   Rel(clinic_Appointment_Frontend, api_gateway, "Makes API calls to", "HTTPS/REST/JSON")
+
+   Rel(api_gateway, patient_microservice, "Making API calls to", "HTTPS/REST/JSON")
+   Rel(api_gateway, doctor_microservice, "Making API calls to", "HTTPS/REST/JSON")
+   Rel(api_gateway, clinic_microservice, "Making API calls to", "HTTPS/REST/JSON")
+   Rel(api_gateway, appointment_microservice, "Making API calls to", "HTTPS/REST/JSON")
+
+   Rel_D(patient_microservice, patients_db, "Reads from and writes to", "JDBA")
+   Rel_D(doctor_microservice, doctors_db, "Reads from and writes to", "JDBA")
+   Rel_D(clinic_microservice, clinics_db, "Reads from and writes to", "JDBA")
+   Rel_R(appointment_microservice, appointments_db, "Reads from and writes to", "MONGO")
+
+   Rel(appointment_microservice, patient_microservice, "Retrieves patient info from", "HTTPS/REST/JSON")
+   Rel(appointment_microservice, doctor_microservice, "Checks doctor availability with", "HTTPS/REST/JSON")
+   Rel(appointment_microservice, clinic_microservice, "Schedules appointment at", "HTTPS/REST/JSON")
+}
+@enduml
