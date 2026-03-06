@@ -20,11 +20,11 @@ public class DoctorController {
     @Autowired
     public DoctorController(DoctorService doctorService, DoctorAssembler doctorAssembler) {
         this.doctorService = doctorService;
-            this.doctorAssembler = doctorAssembler;
+        this.doctorAssembler = doctorAssembler;
     }
 
     @PostMapping
-    public ResponseEntity<DoctorResponseModel>  createDoctor(
+    public ResponseEntity<DoctorResponseModel> createDoctor(
             @RequestBody DoctorRequestModel request
     ) {
         return new ResponseEntity<>(doctorService.createDoctor(request), HttpStatus.CREATED);

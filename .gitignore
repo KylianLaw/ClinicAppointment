@@ -35,3 +35,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+# MySQL runtime files
+*.sock
+data/mysql/
+mysql.sock
+
+# Database files
+*.log
+*.pid
+*.err
