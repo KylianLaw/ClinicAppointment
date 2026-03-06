@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/patients")
@@ -22,12 +23,13 @@ public class PatientController {
         this.patientAssembler = patientAssembler;
     }
 
-    //Create a patient
+    // Create a patient
     @PostMapping
-    public ResponseEntity<PatientResponseModel> createPatient(
+    public ResponseEntity<EntityModel<PatientResponseModel>> createPatient(
             @RequestBody PatientRequestModel request
     ) {
-        return new ResponseEntity<>(patientService.createPatient(request), HttpStatus.CREATED);
+        PatientResponseModel createdPatient = patientService.createPatient(request);
+        return new ResponseEntity<>(patientAssembler.toModel(createdPatient), HttpStatus.CREATED);
     }
 
     // Get by ID
@@ -41,20 +43,26 @@ public class PatientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PatientResponseModel>> getAllPatients() {
-        return new ResponseEntity<>(patientService.getAllPatients(), HttpStatus.OK);
+    public ResponseEntity<List<EntityModel<PatientResponseModel>>> getAllPatients() {
+        List<EntityModel<PatientResponseModel>> patients = patientService.getAllPatients()
+                .stream()
+                .map(patientAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(patients, HttpStatus.OK);
     }
 
     @PutMapping("/{patientId}")
-    public ResponseEntity<PatientResponseModel> updatePatient(
+    public ResponseEntity<EntityModel<PatientResponseModel>> updatePatient(
             @PathVariable String patientId,
             @RequestBody PatientRequestModel request
     ) {
-        return new ResponseEntity<>(patientService.updatePatient(patientId,request ), HttpStatus.OK );
-}
+        PatientResponseModel updatedPatient = patientService.updatePatient(patientId, request);
+        return new ResponseEntity<>(patientAssembler.toModel(updatedPatient), HttpStatus.OK);
+    }
 
     @DeleteMapping("/{patientId}")
-    public ResponseEntity<PatientResponseModel> deletePatient(
+    public ResponseEntity<Void> deletePatient(
             @PathVariable String patientId
     ) {
         patientService.deletePatient(patientId);

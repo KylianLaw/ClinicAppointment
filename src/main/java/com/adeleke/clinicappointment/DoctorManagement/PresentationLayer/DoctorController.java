@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/doctors")
@@ -23,10 +24,11 @@ public class DoctorController {
     }
 
     @PostMapping
-    public ResponseEntity<DoctorResponseModel> createDoctor(
+    public ResponseEntity<EntityModel<DoctorResponseModel>> createDoctor(
             @RequestBody DoctorRequestModel request
     ) {
-        return new ResponseEntity<>(doctorService.createDoctor(request), HttpStatus.CREATED);
+        DoctorResponseModel createdDoctor = doctorService.createDoctor(request);
+        return new ResponseEntity<>(doctorAssembler.toModel(createdDoctor), HttpStatus.CREATED);
     }
 
     @GetMapping("/{doctorId}")
@@ -39,20 +41,26 @@ public class DoctorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DoctorResponseModel>> getAllDoctors() {
-        return new ResponseEntity<>(doctorService.getAllDoctors(), HttpStatus.OK);
+    public ResponseEntity<List<EntityModel<DoctorResponseModel>>> getAllDoctors() {
+        List<EntityModel<DoctorResponseModel>> doctors = doctorService.getAllDoctors()
+                .stream()
+                .map(doctorAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(doctors, HttpStatus.OK);
     }
 
     @PutMapping("/{doctorId}")
-    public ResponseEntity<DoctorResponseModel> updateDoctor(
+    public ResponseEntity<EntityModel<DoctorResponseModel>> updateDoctor(
             @PathVariable String doctorId,
             @RequestBody DoctorRequestModel requestModel
     ) {
-        return new ResponseEntity<>(doctorService.updateDoctor(doctorId, requestModel), HttpStatus.OK);
+        DoctorResponseModel updatedDoctor = doctorService.updateDoctor(doctorId, requestModel);
+        return new ResponseEntity<>(doctorAssembler.toModel(updatedDoctor), HttpStatus.OK);
     }
 
     @DeleteMapping("/{doctorId}")
-    public ResponseEntity<DoctorResponseModel> deleteDoctor(
+    public ResponseEntity<Void> deleteDoctor(
             @PathVariable String doctorId
     ) {
         doctorService.deleteDoctor(doctorId);

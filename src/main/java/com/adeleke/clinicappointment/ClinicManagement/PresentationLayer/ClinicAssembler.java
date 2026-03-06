@@ -17,7 +17,9 @@ public class ClinicAssembler implements RepresentationModelAssembler<ClinicRespo
         EntityModel<ClinicResponseModel> model = EntityModel.of(dto,
                 linkTo(methodOn(ClinicController.class).getClinic(dto.getClinicId())).withSelfRel(),
                 linkTo(methodOn(ClinicController.class).getAllClinics()).withRel("clinics"),
-                linkTo(methodOn(ClinicController.class).updateClinic(dto.getClinicId(), null)).withRel("update clinic")
+                linkTo(methodOn(ClinicController.class).createClinic(null)).withRel("create clinic"),
+                linkTo(methodOn(ClinicController.class).updateClinic(dto.getClinicId(), null)).withRel("update clinic"),
+                linkTo(methodOn(ClinicController.class).deleteClinic(dto.getClinicId())).withRel("delete clinic")
         );
 
         return model;

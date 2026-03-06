@@ -14,10 +14,13 @@ public class DoctorAssembler implements RepresentationModelAssembler<DoctorRespo
     @Override
     public EntityModel<DoctorResponseModel> toModel(DoctorResponseModel dto) {
 
+
         EntityModel<DoctorResponseModel> model = EntityModel.of(dto,
                 linkTo(methodOn(DoctorController.class).getDoctorById(dto.getDoctorId())).withSelfRel(),
                 linkTo(methodOn(DoctorController.class).getAllDoctors()).withRel("doctors"),
-                linkTo(methodOn(DoctorController.class).updateDoctor(dto.getDoctorId(), null)).withRel("update doctor")
+                linkTo(methodOn(DoctorController.class).createDoctor(null)).withRel("create doctor"),
+                linkTo(methodOn(DoctorController.class).updateDoctor(dto.getDoctorId(), null)).withRel("update doctor"),
+                linkTo(methodOn(DoctorController.class).deleteDoctor(dto.getDoctorId())).withRel("delete doctor")
         );
 
         return model;

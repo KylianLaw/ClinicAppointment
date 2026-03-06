@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/clinics")
@@ -16,6 +17,7 @@ public class ClinicController {
 
     private final ClinicService clinicService;
     private final ClinicAssembler clinicAssembler;
+
     @Autowired
     public ClinicController(ClinicService clinicService, ClinicAssembler clinicAssembler) {
         this.clinicService = clinicService;
@@ -23,14 +25,17 @@ public class ClinicController {
     }
 
     @PostMapping
-    public ResponseEntity<ClinicResponseModel> createClinic(@RequestBody
-            ClinicRequestModel request
+    public ResponseEntity<EntityModel<ClinicResponseModel>> createClinic(
+            @RequestBody ClinicRequestModel request
     ) {
-        return new ResponseEntity<>(clinicService.createClinic(request), HttpStatus.CREATED);
+        ClinicResponseModel createdClinic = clinicService.createClinic(request);
+        return new ResponseEntity<>(clinicAssembler.toModel(createdClinic), HttpStatus.CREATED);
     }
 
     @GetMapping("/{clinicId}")
-    public ResponseEntity<EntityModel<ClinicResponseModel>> getClinic(@PathVariable String clinicId) {
+    public ResponseEntity<EntityModel<ClinicResponseModel>> getClinic(
+            @PathVariable String clinicId
+    ) {
         ClinicResponseModel clinic = clinicService.getClinicById(clinicId);
         EntityModel<ClinicResponseModel> model = clinicAssembler.toModel(clinic);
 
@@ -38,26 +43,29 @@ public class ClinicController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClinicResponseModel>> getAllClinics() {
-        return new ResponseEntity<>(clinicService.getAllClinics(), HttpStatus.OK);
+    public ResponseEntity<List<EntityModel<ClinicResponseModel>>> getAllClinics() {
+        List<EntityModel<ClinicResponseModel>> clinics = clinicService.getAllClinics()
+                .stream()
+                .map(clinicAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(clinics, HttpStatus.OK);
     }
 
     @PutMapping("/{clinicId}")
-    public ResponseEntity<ClinicResponseModel> updateClinic(
+    public ResponseEntity<EntityModel<ClinicResponseModel>> updateClinic(
             @PathVariable String clinicId,
             @RequestBody ClinicRequestModel requestModel
     ) {
-        return new ResponseEntity<>(clinicService.updateClinic(clinicId, requestModel), HttpStatus.OK);
+        ClinicResponseModel updatedClinic = clinicService.updateClinic(clinicId, requestModel);
+        return new ResponseEntity<>(clinicAssembler.toModel(updatedClinic), HttpStatus.OK);
     }
 
     @DeleteMapping("/{clinicId}")
-    public ResponseEntity<ClinicResponseModel> deleteClinic(
+    public ResponseEntity<Void> deleteClinic(
             @PathVariable String clinicId
     ) {
         clinicService.deleteClinic(clinicId);
-        return new ResponseEntity<>( HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-
-
 }

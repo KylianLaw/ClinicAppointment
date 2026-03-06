@@ -16,7 +16,9 @@ public class PatientAssembler implements RepresentationModelAssembler<PatientRes
         EntityModel<PatientResponseModel> model = EntityModel.of(dto,
                 linkTo(methodOn(PatientController.class).getPatientById(dto.getPatientId())).withSelfRel(),
                 linkTo(methodOn(PatientController.class).getAllPatients()).withRel("patients"),
-                linkTo(methodOn(PatientController.class).updatePatient(dto.getPatientId(), null)).withRel("update patient")
+                linkTo(methodOn(PatientController.class).createPatient(null)).withRel("create patient"),
+                linkTo(methodOn(PatientController.class).updatePatient(dto.getPatientId(), null)).withRel("update patient"),
+                linkTo(methodOn(PatientController.class).deletePatient(dto.getPatientId())).withRel("delete patient")
         );
         return model;
     }
