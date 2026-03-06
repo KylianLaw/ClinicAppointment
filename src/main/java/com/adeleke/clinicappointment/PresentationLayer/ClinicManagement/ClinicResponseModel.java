@@ -12,5 +12,5 @@ import org.springframework.hateoas.RepresentationModel;
 public class ClinicResponseModel extends RepresentationModel<ClinicResponseModel> {
     String clinicId;
     String clinicName;
-    ClinicAddress clinicAddressResponse;
+    ClinicAddress clinicAddress;
 }

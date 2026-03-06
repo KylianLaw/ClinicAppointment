@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClinicRequestModel {
     String clinicName;
-    ClinicAddress clinicAddressRequest;
+    ClinicAddress clinicAddress;
 }

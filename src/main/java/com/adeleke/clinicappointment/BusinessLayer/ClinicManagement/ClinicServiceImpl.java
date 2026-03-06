@@ -58,7 +58,7 @@ public class ClinicServiceImpl implements ClinicService {
         }
 
         clinic.setClinicName(requestModel.getClinicName());
-        clinic.setClinicAddress(requestModel.getClinicAddressRequest());
+        clinic.setClinicAddress(requestModel.getClinicAddress());
 
         Clinic updated = clinicRepository.save(clinic);
         return clinicResponseMapper.toClinicResponse(updated);

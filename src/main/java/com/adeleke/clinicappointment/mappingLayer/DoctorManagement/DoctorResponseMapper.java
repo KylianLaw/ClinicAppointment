@@ -15,7 +15,7 @@ import java.util.List;
 public interface DoctorResponseMapper {
 
     @Mappings({
-            @Mapping(source = "doctorId.doctorId()", target = "doctorId"),
+            @Mapping(source = "doctorId.doctorId", target = "doctorId"),
             @Mapping(source = "doctorFullName", target = "doctorFullName"),
             @Mapping(source = "specialty", target = "specialty", qualifiedByName = "specialtyEnumToString")
     })
