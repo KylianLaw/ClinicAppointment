@@ -15,7 +15,7 @@ public interface ClinicRequestMapper {
             @Mapping(target = "id", ignore = true),
             @Mapping(expression = "java(clinicId)", target = "clinicId"),
             @Mapping(source = "requestModel.clinicName", target = "clinicName"),
-            @Mapping(source = "requestModel.clinicAddress", target = "address")
+            @Mapping(source = "requestModel.clinicAddress", target = "clinicAddress")
     })
     Clinic toEntity(ClinicRequestModel requestModel,
                     ClinicIdentifier clinicId);
