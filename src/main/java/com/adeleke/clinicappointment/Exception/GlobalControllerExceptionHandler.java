@@ -1,5 +1,7 @@
 package com.adeleke.clinicappointment.Exception;
 
+import com.adeleke.clinicappointment.Exception.exceptions.DuplicateDoctorException;
+import com.adeleke.clinicappointment.Exception.exceptions.DuplicatePatientException;
 import com.adeleke.clinicappointment.Exception.exceptions.InvalidInputException;
 import com.adeleke.clinicappointment.Exception.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -9,8 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 @Slf4j
@@ -27,21 +28,23 @@ public class GlobalControllerExceptionHandler {
     public HttpErrorInfo handleInvalidInputException(WebRequest request, Exception ex) {
         return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
     }
-//
-//    @ResponseStatus(UNPROCESSABLE_ENTITY)
-//    @ExceptionHandler(DuplicateVinException.class)
-//    public com.gerard.cardealershipws2024.utils.HttpErrorInfo handleDuplicateVinException(WebRequest request, Exception ex) {
-//        return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
-//    }
 
+    @ResponseStatus(CONFLICT)
+    @ExceptionHandler(DuplicatePatientException.class)
+    public HttpErrorInfo handleDuplicatePatientException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(CONFLICT, request, ex);
+    }
 
-
+    @ResponseStatus(CONFLICT)
+    @ExceptionHandler(DuplicateDoctorException.class)
+    public HttpErrorInfo handleDuplicateDoctorException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(CONFLICT, request, ex);
+    }
     private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, WebRequest request, Exception ex) {
         final String path = request.getDescription(false);
-        // final String path = request.getPath().pathWithinApplication().value();
         final String message = ex.getMessage();
-        log.debug("message is: " + message);
 
+        log.debug("message is: {}", message);
         log.debug("Returning HTTP status: {} for path: {}, message: {}", httpStatus, path, message);
 
         return new HttpErrorInfo(httpStatus, path, message);
