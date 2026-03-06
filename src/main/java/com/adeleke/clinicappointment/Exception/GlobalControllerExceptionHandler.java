@@ -1,9 +1,6 @@
 package com.adeleke.clinicappointment.Exception;
 
-import com.adeleke.clinicappointment.Exception.exceptions.DuplicateDoctorException;
-import com.adeleke.clinicappointment.Exception.exceptions.DuplicatePatientException;
-import com.adeleke.clinicappointment.Exception.exceptions.InvalidInputException;
-import com.adeleke.clinicappointment.Exception.exceptions.NotFoundException;
+import com.adeleke.clinicappointment.Exception.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,6 +37,13 @@ public class GlobalControllerExceptionHandler {
     public HttpErrorInfo handleDuplicateDoctorException(WebRequest request, Exception ex) {
         return createHttpErrorInfo(CONFLICT, request, ex);
     }
+
+    @ResponseStatus(CONFLICT)
+    @ExceptionHandler(DuplicateClinicException.class)
+    public HttpErrorInfo handleDuplicateClinicException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(CONFLICT, request, ex);
+    }
+
     private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, WebRequest request, Exception ex) {
         final String path = request.getDescription(false);
         final String message = ex.getMessage();
