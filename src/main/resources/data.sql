@@ -1,37 +1,53 @@
-INSERT INTO Patients (patient_id,
-                      patient_full_name,
-                      birth_date,
-                      street,
-                      city,
-                      postal_code,
-                      email,
-                      phone_number)
-VALUES ('PAT-001', 'John Doe', '1990-05-12', '123 Main St', 'Montreal', 'H2X1Y4', 'john.doe@email.com', '5141234567'),
+------------------------------------------------
+-- PATIENTS
+------------------------------------------------
 
-       ('PAT-002', 'Sarah Johnson', '1985-08-22', '45 Maple Ave', 'Laval', 'H7N2L5', 'sarah.johnson@email.com',
-        '4385551234'),
+INSERT INTO Patients (patient_id, patient_full_name, birth_date, street, city, postal_code, email, phone_number)
+VALUES ('PAT-001', 'John Smith', '1985-03-15', '123 Maple St', 'Montreal', 'H2X1A1', 'john.smith@email.com', '514-555-1001');
 
-       ('PAT-003', 'Michael Brown', '1978-03-17', '89 Cedar Rd', 'Longueuil', 'J4K3L9', 'michael.brown@email.com',
-        '4509876543'),
+INSERT INTO Patients VALUES
+                         (NULL,'PAT-002','Emily Johnson','1992-07-21','456 Oak Ave','Longueuil','J4K2P4','emily.johnson@email.com','514-555-1002'),
+                         (NULL,'PAT-003','Michael Brown','1978-11-05','789 Pine Rd','Brossard','J4Z3T2','michael.brown@email.com','514-555-1003'),
+                         (NULL,'PAT-004','Sarah Davis','1990-04-10','321 Birch St','Laval','H7A4K2','sarah.davis@email.com','514-555-1004'),
+                         (NULL,'PAT-005','David Wilson','1982-09-18','654 Cedar Blvd','Montreal','H3Z2Y7','david.wilson@email.com','514-555-1005'),
+                         (NULL,'PAT-006','Olivia Martinez','1995-01-30','987 Spruce Dr','Brossard','J4W1K6','olivia.m@email.com','514-555-1006'),
+                         (NULL,'PAT-007','Daniel Anderson','1975-06-12','147 Willow Ln','Longueuil','J4L3A5','daniel.a@email.com','514-555-1007'),
+                         (NULL,'PAT-008','Sophia Thomas','2000-02-22','258 Cherry St','Montreal','H1A2B3','sophia.t@email.com','514-555-1008'),
+                         (NULL,'PAT-009','James Taylor','1988-08-14','369 Walnut Rd','Laval','H7P5M2','james.t@email.com','514-555-1009'),
+                         (NULL,'PAT-010','Emma White','1997-12-03','159 Poplar St','Brossard','J4Y2S7','emma.white@email.com','514-555-1010');
 
-       ('PAT-004', 'Emily Davis', '1995-11-02', '210 Pine St', 'Brossard', 'J4Y1A2', 'emily.davis@email.com',
-        '5147778899'),
+------------------------------------------------
+-- DOCTORS
+------------------------------------------------
 
-       ('PAT-005', 'David Wilson', '1982-07-10', '56 Oak Blvd', 'Sherbrooke', 'J1H4T3', 'david.wilson@email.com',
-        '8194561122'),
+INSERT INTO Doctors (doctor_id, doctor_full_name, specialty)
+VALUES ('DOC-001','Dr. Laura Green','CARDIOLOGY');
 
-       ('PAT-006', 'Jessica Miller', '1993-01-28', '300 Birch Ln', 'Quebec City', 'G1K7P4', 'jessica.miller@email.com',
-        '4183345566'),
+INSERT INTO Doctors VALUES
+                        (NULL,'DOC-002','Dr. Robert Hall','DERMATOLOGY'),
+                        (NULL,'DOC-003','Dr. Angela Young','PEDIATRICS'),
+                        (NULL,'DOC-004','Dr. Kevin King','ORTHOPEDICS'),
+                        (NULL,'DOC-005','Dr. Rachel Scott','NEUROLOGY'),
+                        (NULL,'DOC-006','Dr. Brian Adams','FAMILY_MEDICINE'),
+                        (NULL,'DOC-007','Dr. Jessica Baker','GYNECOLOGY'),
+                        (NULL,'DOC-008','Dr. Steven Nelson','PSYCHIATRY'),
+                        (NULL,'DOC-009','Dr. Natalie Carter','ENDOCRINOLOGY'),
+                        (NULL,'DOC-010','Dr. Matthew Mitchell','RADIOLOGY');
 
-       ('PAT-007', 'Daniel Garcia', '1975-09-14', '78 Elm St', 'Gatineau', 'J8T5R2', 'daniel.garcia@email.com',
-        '8191239988'),
+------------------------------------------------
+-- CLINICS
+------------------------------------------------
 
-       ('PAT-008', 'Olivia Martinez', '2000-06-19', '145 Willow Dr', 'Trois-Rivieres', 'G9A2B6',
-        'olivia.martinez@email.com', '8194456677'),
+INSERT INTO Clinics (clinic_id, clinic_name, street, city, postal_code)
+VALUES ('CLINIC-001','Downtown Medical Center','1200 St Catherine St','Montreal','H3B1K5');
 
-       ('PAT-009', 'James Anderson', '1988-04-30', '67 Spruce Way', 'Drummondville', 'J2B4N3',
-        'james.anderson@email.com', '8193348899'),
-
-       ('PAT-010', 'Sophia Taylor', '1997-12-05', '500 River Rd', 'Saint-Hyacinthe', 'J2S3K1',
-        'sophia.taylor@email.com', '4505567788');
-
+INSERT INTO Clinics VALUES
+                        (NULL,'CLINIC-002','Brossard Family Clinic','5000 Taschereau Blvd','Brossard','J4Z1A7'),
+                        (NULL,'CLINIC-003','Longueuil Health Clinic','825 Chemin Chambly','Longueuil','J4H3M1'),
+                        (NULL,'CLINIC-004','Laval Medical Group','1000 Boulevard Curé-Labelle','Laval','H7V3X7'),
+                        (NULL,'CLINIC-005','West Island Clinic','2000 Boulevard St Jean','Pointe-Claire','H9R5M9'),
+                        (NULL,'CLINIC-006','Plateau Medical Clinic','3500 Rue St Denis','Montreal','H2X3L7'),
+                        (NULL,'CLINIC-007','South Shore Health Center','4200 Boulevard Matte','Brossard','J4Y2P4'),
+                        (NULL,'CLINIC-008','Montreal Pediatric Clinic','2100 Sherbrooke St','Montreal','H2K1C3'),
+                        (NULL,'CLINIC-009','Laval Family Care','1450 Boulevard Concorde','Laval','H7G2E5'),
+                        (NULL,'CLINIC-010','Urban Wellness Clinic','1800 Boulevard Rene-Levesque','Montreal','H3H2P3');

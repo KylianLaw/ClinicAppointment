@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.adeleke'
@@ -19,10 +20,16 @@ configurations {
         extendsFrom annotationProcessor
     }
 }
+ext {
+    mapstructVersion = "1.6.3"
+    lombokVersion = "1.18.36"
+    lombokMapstructBindingVersion = "0.2.0"
+}
 
 repositories {
     mavenCentral()
 }
+
 ext {
     mapstructVersion = "1.5.5.Final"
     lombokVersion = "1.18.32"
@@ -36,7 +43,7 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.38'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'com.h2database:h2'
@@ -50,11 +57,40 @@ dependencies {
 
 
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+//"com/movielister/**/MovieDetailsServiceApplication.class",
+// "**/*MapperImpl.class"
+            ])
+        }))
+    }
+}
+
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.00
+            }
+        }
+    }
+}
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
