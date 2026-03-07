@@ -1,7 +1,6 @@
 package com.adeleke.clinicappointment.AppointmentManagement.PresentationLayer;
 
 
-import com.adeleke.clinicappointment.AppointmentManagement.DataLayer.AppointmentStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,18 +11,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AppointmentRequestModel {
-    // Doctor management subdomain
-    String doctorFullName;
 
-    String Speciality;
+    private String patientId;
+    private String doctorId;
+    private String clinicId;
 
-    //Patient management subdomain
+    private LocalDateTime appointmentDateTime;
 
-    String patientFullName;
-
-
-    LocalDateTime localDateTime;
-
-
-    AppointmentStatusEnum appointmentStatus;
 }

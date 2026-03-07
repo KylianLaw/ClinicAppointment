@@ -100,95 +100,87 @@ rectangle "Clinic Appointment Booking Context" as ClinicBC #line.dashed {
         Clinic "1" -- "1" ClinicAddress
     }
 package "Appointment Management Sub-Domain (CORE)" as AppointmentSD #E6D9FF {
+' =========================
+' AGGREGATE 1 : Appointment
+' =========================
 
-    ' =========================
-    ' AGGREGATE 1 : Appointment
-    ' =========================
+AGGREGATE_ROOT(Appointment) #CDB4FF {
+    appointmentId: UUID
+    patientId: UUID
+    doctorId: UUID
+    clinicId: UUID
+    appointmentDateTime: LocalDateTime
+    appointmentStatus: AppointmentStatusEnum
+}
 
-    AGGREGATE_ROOT(Appointment) #CDB4FF {
-        appointmentId: UUID
-        patientId: UUID
-        doctorId: UUID
-        clinicId: UUID
-        slotId: UUID
-        appointmentDateTime: LocalDateTime
-        appointmentStatus: AppointmentStatusEnum
-    }
+VALUE_OBJECT(AppointmentIdentifier) #F5F5F5 {
+    appointmentId: UUID
+}
 
-    VALUE_OBJECT(AppointmentIdentifier) #F5F5F5 {
-        appointmentId: UUID
-    }
+ENUM(AppointmentStatusEnum) #E6E6E6 {
+    SCHEDULED
+    CANCELLED
+    COMPLETED
+}
 
-    ENUM(AppointmentStatusEnum) #E6E6E6 {
-        SCHEDULED
-        CANCELLED
-        COMPLETED
-    }
+Appointment --> AppointmentStatusEnum
+Appointment --> AppointmentIdentifier
 
-    Appointment --> AppointmentStatusEnum
-    Appointment --> AppointmentIdentifier
+' references to other aggregates via identifiers only
+Appointment -d-> PatientIdentifier
+Appointment -d-> DoctorIdentifier
+Appointment -d-> ClinicIdentifier
 
-    ' references to other aggregates via identifiers only
-    Appointment -d-> PatientIdentifier
-    Appointment -d-> DoctorIdentifier
-    Appointment -d-> ClinicIdentifier
-    Appointment -d-> AppointmentSlotIdentifier : "References slot"
-
-
-    note right of Appointment #FFF3B0
-    Invariants:
-    - Appointment cannot exist without valid slotId
-    - Appointment cannot be scheduled in the past
-    - Patient cannot have overlapping appointments
-    end note
+note right of Appointment #FFF3B0
+Invariants:
+- Appointment cannot be scheduled in the past
+- Patient cannot have overlapping appointments
+- CANCELLED appointment cannot become COMPLETED
+end note
 
 
 
-    ' =========================
-    ' AGGREGATE 2 : AppointmentSlot
-    ' =========================
+' =========================
+' AGGREGATE 2 : AppointmentFollowUpPlan
+' =========================
 
-    AGGREGATE_ROOT(AppointmentSlot) #CDB4FF {
-        slotId: UUID
-        doctorId: UUID
-        clinicId: UUID
-        timeRange: TimeRange
-        status: SlotStatusEnum
-    }
+AGGREGATE_ROOT(AppointmentFollowUpPlan) #CDB4FF {
+    followUpPlanId: UUID
+    appointmentId: UUID
+    patientId: UUID
+    doctorId: UUID
+    clinicId: UUID
+    recommendedFollowUpDate: LocalDateTime
+    followUpReason: String
+    status: FollowUpPlanStatusEnum
+}
 
-    VALUE_OBJECT(AppointmentSlotIdentifier) #F5F5F5 {
-        slotId: UUID
-    }
+VALUE_OBJECT(AppointmentFollowUpPlanIdentifier) #F5F5F5 {
+    followUpPlanId: UUID
+}
 
-    VALUE_OBJECT(TimeRange) #F5F5F5 {
-        startTime: LocalDateTime
-        endTime: LocalDateTime
-    }
+ENUM(FollowUpPlanStatusEnum) #E6E6E6 {
+    PLANNED
+    COMPLETED
+    CANCELLED
+}
 
-    ENUM(SlotStatusEnum) #E6E6E6 {
-        AVAILABLE
-        RESERVED
-        BOOKED
-        BLOCKED
-    }
+AppointmentFollowUpPlan --> AppointmentFollowUpPlanIdentifier
+AppointmentFollowUpPlan --> FollowUpPlanStatusEnum
 
-    AppointmentSlot --> AppointmentSlotIdentifier
-    AppointmentSlot --> TimeRange
-    AppointmentSlot --> SlotStatusEnum
+' references to other aggregates via identifiers only
+AppointmentFollowUpPlan -d-> AppointmentIdentifier
+AppointmentFollowUpPlan -d-> PatientIdentifier
+AppointmentFollowUpPlan -d-> DoctorIdentifier
+AppointmentFollowUpPlan -d-> ClinicIdentifier
 
-    AppointmentSlot -d-> DoctorIdentifier
-    AppointmentSlot -d-> ClinicIdentifier
-
-
-    note right of AppointmentSlot #FFF3B0
-    Invariants:
-    - startTime must be before endTime
-    - Doctor cannot have overlapping slots
-    - BOOKED slot cannot become AVAILABLE again
-    - Slot cannot be double-booked
-    end note
-
-
+note right of AppointmentFollowUpPlan #FFF3B0
+Invariants:
+- Follow-up plan must reference a valid appointment
+- recommendedFollowUpDate must be after the original appointmentDateTime
+- A COMPLETED follow-up plan cannot become PLANNED again
+- A CANCELLED follow-up plan cannot become COMPLETED
+end note
 
     ' =========================
     ' CORE SUBDOMAIN RELATIONS

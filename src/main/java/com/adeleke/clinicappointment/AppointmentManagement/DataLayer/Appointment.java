@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Appointment")
+@Table(name = "appointments")
     public class Appointment {
 
     @Id
@@ -39,15 +39,31 @@ import java.time.LocalDateTime;
     @Column(name = "appointment_status")
     private AppointmentStatusEnum appointmentStatus;
 
-    public Appointment(AppointmentIdentifier appointmentId, DoctorIdentifier doctorIdentifier, PatientIdentifier patientIdentifier, ClinicIdentifier clinicIdentifier, LocalDateTime appointmentDateTime, AppointmentStatusEnum appointmentStatus) {
+    public Appointment(
+            AppointmentIdentifier appointmentId,
+            DoctorIdentifier doctorIdentifier,
+            PatientIdentifier patientIdentifier,
+            ClinicIdentifier clinicIdentifier,
+            LocalDateTime appointmentDateTime
+    ) {
 
-        if(appointmentId == null) throw new IllegalArgumentException("appointmentId cannot be null");
-        if(doctorIdentifier == null) throw new IllegalArgumentException("doctorIdentifier cannot be null");
-        if(patientIdentifier == null) throw new IllegalArgumentException("patientIdentifier cannot be null");
-        if(clinicIdentifier == null) throw new IllegalArgumentException("clinicIdentifier cannot be null");
-        if(appointmentDateTime == null) throw new IllegalArgumentException("appointmentDateTime cannot be null");
+        if (appointmentId == null)
+            throw new IllegalArgumentException("appointmentId cannot be null");
 
+        if (doctorIdentifier == null)
+            throw new IllegalArgumentException("doctorIdentifier cannot be null");
 
+        if (patientIdentifier == null)
+            throw new IllegalArgumentException("patientIdentifier cannot be null");
+
+        if (clinicIdentifier == null)
+            throw new IllegalArgumentException("clinicIdentifier cannot be null");
+
+        if (appointmentDateTime == null)
+            throw new IllegalArgumentException("appointmentDateTime cannot be null");
+
+        if (appointmentDateTime.isBefore(LocalDateTime.now()))
+            throw new IllegalArgumentException("Appointment cannot be scheduled in the past");
 
         this.appointmentId = appointmentId;
         this.doctorIdentifier = doctorIdentifier;
@@ -56,20 +72,47 @@ import java.time.LocalDateTime;
         this.appointmentDateTime = appointmentDateTime;
         this.appointmentStatus = AppointmentStatusEnum.SCHEDULED;
     }
-    public void CancelAppointment() {
 
-        if (this.appointmentStatus == AppointmentStatusEnum.COMPLETED) throw new IllegalArgumentException("Completed appointments cannot be cancelled");
+    public void cancelAppointment() {
+
+        if (this.appointmentStatus == AppointmentStatusEnum.COMPLETED)
+            throw new IllegalStateException("Completed appointments cannot be cancelled");
 
         this.appointmentStatus = AppointmentStatusEnum.CANCELLED;
     }
 
-    public void CompleteAppointment(AppointmentStatusEnum appointmentStatus) {
+    public void completeAppointment() {
 
-        if (this.appointmentStatus == AppointmentStatusEnum.CANCELLED) throw new IllegalArgumentException("Cancelled appointments cannot be completed");
+        if (this.appointmentStatus == AppointmentStatusEnum.CANCELLED)
+            throw new IllegalStateException("Cancelled appointments cannot be completed");
 
         this.appointmentStatus = AppointmentStatusEnum.COMPLETED;
     }
-    public void setAppointmentStatus(AppointmentStatusEnum appointmentStatus) {
-        this.appointmentStatus = appointmentStatus;
+
+    public void updateAppointmentDetails(
+            DoctorIdentifier doctorIdentifier,
+            PatientIdentifier patientIdentifier,
+            ClinicIdentifier clinicIdentifier,
+            LocalDateTime appointmentDateTime
+    ) {
+        if (doctorIdentifier == null)
+            throw new IllegalArgumentException("doctorIdentifier cannot be null");
+
+        if (patientIdentifier == null)
+            throw new IllegalArgumentException("patientIdentifier cannot be null");
+
+        if (clinicIdentifier == null)
+            throw new IllegalArgumentException("clinicIdentifier cannot be null");
+
+        if (appointmentDateTime == null)
+            throw new IllegalArgumentException("appointmentDateTime cannot be null");
+
+        if (appointmentDateTime.isBefore(LocalDateTime.now()))
+            throw new IllegalArgumentException("Appointment cannot be scheduled in the past");
+
+        this.doctorIdentifier = doctorIdentifier;
+        this.patientIdentifier = patientIdentifier;
+        this.clinicIdentifier = clinicIdentifier;
+        this.appointmentDateTime = appointmentDateTime;
     }
 }

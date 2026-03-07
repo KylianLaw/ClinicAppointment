@@ -53,3 +53,31 @@ INSERT INTO Clinics VALUES
                         (NULL,'CLINIC-008','Montreal Pediatric Clinic','2100 Sherbrooke St','Montreal','H2K1C3'),
                         (NULL,'CLINIC-009','Laval Family Care','1450 Boulevard Concorde','Laval','H7G2E5'),
                         (NULL,'CLINIC-010','Urban Wellness Clinic','1800 Boulevard Rene-Levesque','Montreal','H3H2P3');
+
+
+------------------------------------------------
+-- APPOINTMENTS
+------------------------------------------------
+
+INSERT INTO appointments
+(appointment_id, doctor_id, patient_id, clinic_id, appointment_date_time, appointment_status)
+VALUES
+    ('APT-001','DOC-001','PAT-001','CLINIC-001','2026-04-01 09:00:00','SCHEDULED'),
+
+    ('APT-002','DOC-002','PAT-002','CLINIC-002','2026-04-01 10:00:00','SCHEDULED'),
+
+    ('APT-003','DOC-003','PAT-003','CLINIC-003','2026-04-01 11:00:00','SCHEDULED'),
+
+    ('APT-004','DOC-004','PAT-004','CLINIC-004','2026-04-02 09:30:00','SCHEDULED'),
+
+    ('APT-005','DOC-005','PAT-005','CLINIC-005','2026-04-02 10:30:00','SCHEDULED'),
+
+    ('APT-006','DOC-006','PAT-006','CLINIC-006','2026-04-02 11:30:00','SCHEDULED'),
+
+    ('APT-007','DOC-007','PAT-007','CLINIC-007','2026-04-03 09:00:00','COMPLETED'),
+
+    ('APT-008','DOC-008','PAT-008','CLINIC-008','2026-04-03 10:00:00','CANCELLED'),
+
+    ('APT-009','DOC-009','PAT-009','CLINIC-009','2026-04-03 11:00:00','SCHEDULED'),
+
+    ('APT-010','DOC-010','PAT-010','CLINIC-010','2026-04-04 09:00:00','SCHEDULED');

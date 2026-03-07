@@ -27,6 +27,12 @@ public class GlobalControllerExceptionHandler {
     }
 
     @ResponseStatus(CONFLICT)
+    @ExceptionHandler(OverlappingAppointmentException.class)
+    public HttpErrorInfo handleOverlappingAppointmentException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(CONFLICT, request, ex);
+    }
+
+    @ResponseStatus(CONFLICT)
     @ExceptionHandler(DuplicatePatientException.class)
     public HttpErrorInfo handleDuplicatePatientException(WebRequest request, Exception ex) {
         return createHttpErrorInfo(CONFLICT, request, ex);
