@@ -4,6 +4,8 @@
 DELETE FROM Clinics;
 DELETE FROM Doctors;
 DELETE FROM Patients;
+DELETE FROM appointment_follow_up_plan;
+
 INSERT INTO Patients (patient_id, patient_full_name, birth_date, street, city, postal_code, email, phone_number)
 VALUES ('PAT-001', 'John Smith', '1985-03-15', '123 Maple St', 'Montreal', 'H2X1A1', 'john.smith@email.com', '514-555-1001');
 
@@ -81,3 +83,51 @@ VALUES
     ('APT-009','DOC-009','PAT-009','CLINIC-009','2026-04-03 11:00:00','SCHEDULED'),
 
     ('APT-010','DOC-010','PAT-010','CLINIC-010','2026-04-04 09:00:00','SCHEDULED');
+
+
+------------------------------------------------
+-- APPOINTMENTS FOLLOW-UP PLANS
+------------------------------------------------
+
+INSERT INTO appointment_follow_up_plan
+(follow_up_plan_id, appointment_id, patient_id, doctor_id, clinic_id, follow_up_reason, recommended_follow_up_date, status)
+VALUES
+    ('FOLLOWUP-001','APT-001','PAT-001','DOC-001','CLINIC-001',
+     'Routine blood pressure follow-up',
+     '2026-04-15 09:00:00','PLANNED'),
+
+    ('FOLLOWUP-002','APT-002','PAT-002','DOC-002','CLINIC-002',
+     'Review skin treatment progress',
+     '2026-04-20 10:00:00','PLANNED'),
+
+    ('FOLLOWUP-003','APT-003','PAT-003','DOC-003','CLINIC-003',
+     'Pediatric growth and symptom reassessment',
+     '2026-04-18 11:00:00','PLANNED'),
+
+    ('FOLLOWUP-004','APT-004','PAT-004','DOC-004','CLINIC-004',
+     'Reassess joint pain and mobility',
+     '2026-04-16 09:30:00','PLANNED'),
+
+    ('FOLLOWUP-005','APT-005','PAT-005','DOC-005','CLINIC-005',
+     'Neurology symptom monitoring',
+     '2026-04-22 10:30:00','PLANNED'),
+
+    ('FOLLOWUP-006','APT-006','PAT-006','DOC-006','CLINIC-006',
+     'Family medicine medication review',
+     '2026-04-17 11:30:00','PLANNED'),
+
+    ('FOLLOWUP-007','APT-007','PAT-007','DOC-007','CLINIC-007',
+     'Post-visit recovery check',
+     '2026-04-10 09:00:00','COMPLETED'),
+
+    ('FOLLOWUP-008','APT-008','PAT-008','DOC-008','CLINIC-008',
+     'Psychiatric reassessment after missed visit',
+     '2026-04-12 10:00:00','CANCELLED'),
+
+    ('FOLLOWUP-009','APT-009','PAT-009','DOC-009','CLINIC-009',
+     'Endocrinology lab result follow-up',
+     '2026-04-24 11:00:00','PLANNED'),
+
+    ('FOLLOWUP-010','APT-010','PAT-010','DOC-010','CLINIC-010',
+     'Radiology imaging review consultation',
+     '2026-04-14 09:00:00','PLANNED');

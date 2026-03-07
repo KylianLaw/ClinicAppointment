@@ -26,6 +26,12 @@ public class GlobalControllerExceptionHandler {
         return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
     }
 
+    @ResponseStatus(UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(InvalidFollowUpPlanStatusTransitionException.class)
+    public HttpErrorInfo handleInvalidFollowUpPlanStatusTransitionException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
+    }
+
     @ResponseStatus(CONFLICT)
     @ExceptionHandler(OverlappingAppointmentException.class)
     public HttpErrorInfo handleOverlappingAppointmentException(WebRequest request, Exception ex) {
