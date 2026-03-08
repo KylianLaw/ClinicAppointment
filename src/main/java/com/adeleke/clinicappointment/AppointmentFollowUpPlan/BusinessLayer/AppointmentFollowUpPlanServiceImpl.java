@@ -195,11 +195,9 @@ public class AppointmentFollowUpPlanServiceImpl implements AppointmentFollowUpPl
             throw new InvalidInputException("Follow-up reason cannot be null or blank");
         }
 
-        // Validate referenced appointment exists
         AppointmentResponseModel appointment =
                 appointmentService.getAppointmentById(requestModel.getAppointmentId());
 
-        // Validate related subdomains exist
         PatientResponseModel patient =
                 patientService.getPatientById(requestModel.getPatientId());
 
