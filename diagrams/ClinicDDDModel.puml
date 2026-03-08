@@ -49,6 +49,15 @@ rectangle "Clinic Appointment Booking Context" as ClinicBC #line.dashed {
 
         Patient "1" -- "1" PatientAddress
         Patient "1" -- "1" PatientContactInfo
+
+        note right of Patient #FFF3B0
+        Invariants:
+        - Patient full name cannot be null or blank
+        - Birth date cannot be null
+        - Patient address must be provided
+        - Patient contact info must be provided
+        - Duplicate patient must not exist
+        end note
     }
 
     package "Doctor Management Sub-Domain (SUPPORTING)" as DoctorSD #C1E1C1 {
@@ -79,6 +88,13 @@ rectangle "Clinic Appointment Booking Context" as ClinicBC #line.dashed {
         }
 
         Doctor "1" -- "1" DoctorContactInfo
+
+        note right of Doctor #FFF3B0
+        Invariants:
+        - Doctor full name cannot be null or blank
+        - Specialty cannot be null
+        - Duplicate doctor must not exist
+        end note
     }
 
     package "Clinic Management Sub-Domain (SUPPORTING)" as ClinicSD #FFD8A8 {
@@ -98,99 +114,106 @@ rectangle "Clinic Appointment Booking Context" as ClinicBC #line.dashed {
         }
 
         Clinic "1" -- "1" ClinicAddress
+
+        note right of Clinic #FFF3B0
+        Invariants:
+        - Clinic name cannot be null or blank
+        - Clinic address must be provided
+        - Street, city, and postal code cannot be null or blank
+        - Duplicate clinic must not exist
+        end note
     }
-package "Appointment Management Sub-Domain (CORE)" as AppointmentSD #E6D9FF {
-' =========================
-' AGGREGATE 1 : Appointment
-' =========================
 
-AGGREGATE_ROOT(Appointment) #CDB4FF {
-    appointmentId: UUID
-    patientId: UUID
-    doctorId: UUID
-    clinicId: UUID
-    appointmentDateTime: LocalDateTime
-    appointmentStatus: AppointmentStatusEnum
+    package "Appointment Management Sub-Domain (CORE)" as AppointmentSD #E6D9FF {
+
+        ' =========================
+        ' AGGREGATE 1 : Appointment
+        ' =========================
+
+        AGGREGATE_ROOT(Appointment) #CDB4FF {
+            appointmentId: UUID
+            patientId: UUID
+            doctorId: UUID
+            clinicId: UUID
+            appointmentDateTime: LocalDateTime
+            appointmentStatus: AppointmentStatusEnum
+        }
+
+        VALUE_OBJECT(AppointmentIdentifier) #F5F5F5 {
+            appointmentId: UUID
+        }
+
+        ENUM(AppointmentStatusEnum) #E6E6E6 {
+            SCHEDULED
+            CANCELLED
+            COMPLETED
+        }
+
+        Appointment --> AppointmentStatusEnum
+        Appointment --> AppointmentIdentifier
+
+        ' references to other aggregates via identifiers only
+        Appointment -d-> PatientIdentifier
+        Appointment -d-> DoctorIdentifier
+        Appointment -d-> ClinicIdentifier
+
+        note right of Appointment #FFF3B0
+        Invariants:
+        - Appointment cannot be scheduled in the past
+        - Patient cannot have overlapping appointments
+        - CANCELLED appointment cannot become COMPLETED
+        end note
+
+
+        ' =========================
+        ' AGGREGATE 2 : AppointmentFollowUpPlan
+        ' =========================
+
+        AGGREGATE_ROOT(AppointmentFollowUpPlan) #CDB4FF {
+            followUpPlanId: UUID
+            appointmentId: UUID
+            patientId: UUID
+            doctorId: UUID
+            clinicId: UUID
+            recommendedFollowUpDate: LocalDateTime
+            followUpReason: String
+            status: FollowUpPlanStatusEnum
+        }
+
+        VALUE_OBJECT(AppointmentFollowUpPlanIdentifier) #F5F5F5 {
+            followUpPlanId: UUID
+        }
+
+        ENUM(FollowUpPlanStatusEnum) #E6E6E6 {
+            PLANNED
+            COMPLETED
+            CANCELLED
+        }
+
+        AppointmentFollowUpPlan --> AppointmentFollowUpPlanIdentifier
+        AppointmentFollowUpPlan --> FollowUpPlanStatusEnum
+
+        ' references to other aggregates via identifiers only
+        AppointmentFollowUpPlan -d-> AppointmentIdentifier
+        AppointmentFollowUpPlan -d-> PatientIdentifier
+        AppointmentFollowUpPlan -d-> DoctorIdentifier
+        AppointmentFollowUpPlan -d-> ClinicIdentifier
+
+        note right of AppointmentFollowUpPlan #FFF3B0
+        Invariants:
+        - Follow-up plan must reference a valid appointment
+        - recommendedFollowUpDate must be after the original appointmentDateTime
+        - A COMPLETED follow-up plan cannot become PLANNED again
+        - A CANCELLED follow-up plan cannot become COMPLETED
+        end note
+
+        ' =========================
+        ' CORE SUBDOMAIN RELATIONS
+        ' =========================
+
+        AppointmentSD -d-> PatientSD : "Associate appointment with patient"
+        AppointmentSD -d-> DoctorSD  : "Check doctor availability"
+        AppointmentSD -d-> ClinicSD  : "Schedule appointment at clinic"
+    }
 }
-
-VALUE_OBJECT(AppointmentIdentifier) #F5F5F5 {
-    appointmentId: UUID
-}
-
-ENUM(AppointmentStatusEnum) #E6E6E6 {
-    SCHEDULED
-    CANCELLED
-    COMPLETED
-}
-
-Appointment --> AppointmentStatusEnum
-Appointment --> AppointmentIdentifier
-
-' references to other aggregates via identifiers only
-Appointment -d-> PatientIdentifier
-Appointment -d-> DoctorIdentifier
-Appointment -d-> ClinicIdentifier
-
-note right of Appointment #FFF3B0
-Invariants:
-- Appointment cannot be scheduled in the past
-- Patient cannot have overlapping appointments
-- CANCELLED appointment cannot become COMPLETED
-end note
-
-
-
-' =========================
-' AGGREGATE 2 : AppointmentFollowUpPlan
-' =========================
-
-AGGREGATE_ROOT(AppointmentFollowUpPlan) #CDB4FF {
-    followUpPlanId: UUID
-    appointmentId: UUID
-    patientId: UUID
-    doctorId: UUID
-    clinicId: UUID
-    recommendedFollowUpDate: LocalDateTime
-    followUpReason: String
-    status: FollowUpPlanStatusEnum
-}
-
-VALUE_OBJECT(AppointmentFollowUpPlanIdentifier) #F5F5F5 {
-    followUpPlanId: UUID
-}
-
-ENUM(FollowUpPlanStatusEnum) #E6E6E6 {
-    PLANNED
-    COMPLETED
-    CANCELLED
-}
-
-AppointmentFollowUpPlan --> AppointmentFollowUpPlanIdentifier
-AppointmentFollowUpPlan --> FollowUpPlanStatusEnum
-
-' references to other aggregates via identifiers only
-AppointmentFollowUpPlan -d-> AppointmentIdentifier
-AppointmentFollowUpPlan -d-> PatientIdentifier
-AppointmentFollowUpPlan -d-> DoctorIdentifier
-AppointmentFollowUpPlan -d-> ClinicIdentifier
-
-note right of AppointmentFollowUpPlan #FFF3B0
-Invariants:
-- Follow-up plan must reference a valid appointment
-- recommendedFollowUpDate must be after the original appointmentDateTime
-- A COMPLETED follow-up plan cannot become PLANNED again
-- A CANCELLED follow-up plan cannot become COMPLETED
-end note
-
-    ' =========================
-    ' CORE SUBDOMAIN RELATIONS
-    ' =========================
-
-    AppointmentSD -d-> PatientSD : "Associate appointment with patient"
-    AppointmentSD -d-> DoctorSD  : "Check doctor availability"
-    AppointmentSD -d-> ClinicSD  : "Schedule appointment at clinic"
-
-}
-
-
 @enduml
