@@ -11,7 +11,7 @@ The system is organized into multiple subdomains:
 * **Clinic Management** (Supporting)
 * **Appointment Management** (Core)
 
-The purpose of the system is to allow scheduling and management of appointments by connecting **patients, doctors, and clinics** through a layered architecture and RESTful API.
+The purpose of the system is to allow scheduling and management of appointments and follow-up plans by connecting **patients, doctors, and clinics** through a layered architecture and RESTful API.
 
 ---
 
@@ -170,6 +170,7 @@ The follow-up plan aggregate contains:
 /api/v1/doctors
 /api/v1/clinics
 /api/v1/appointments
+/api/v1/follow-up-plans
 ```
 
 ---
@@ -177,50 +178,64 @@ The follow-up plan aggregate contains:
 # Patient Endpoints
 
 | Method | Endpoint                     | Description       |
-| ------ | ---------------------------- | ----------------- |
-| POST   | /api/v1/patients             | Create patient    |
-| GET    | /api/v1/patients/{patientId} | Get patient by id |
-| GET    | /api/v1/patients             | Get all patients  |
-| PUT    | /api/v1/patients/{patientId} | Update patient    |
-| DELETE | /api/v1/patients/{patientId} | Delete patient    |
+|------|-----------------------------|-----------------|
+| POST | /api/v1/patients | Create patient |
+| GET | /api/v1/patients/{patientId} | Get patient by id |
+| GET | /api/v1/patients | Get all patients |
+| PUT | /api/v1/patients/{patientId} | Update patient |
+| DELETE | /api/v1/patients/{patientId} | Delete patient |
 
 ---
 
 # Doctor Endpoints
 
-| Method | Endpoint                   | Description      |
-| ------ | -------------------------- | ---------------- |
-| POST   | /api/v1/doctors            | Create doctor    |
-| GET    | /api/v1/doctors/{doctorId} | Get doctor by id |
-| GET    | /api/v1/doctors            | Get all doctors  |
-| PUT    | /api/v1/doctors/{doctorId} | Update doctor    |
-| DELETE | /api/v1/doctors/{doctorId} | Delete doctor    |
+| Method | Endpoint | Description |
+|------|-----------|-------------|
+| POST | /api/v1/doctors | Create doctor |
+| GET | /api/v1/doctors/{doctorId} | Get doctor by id |
+| GET | /api/v1/doctors | Get all doctors |
+| PUT | /api/v1/doctors/{doctorId} | Update doctor |
+| DELETE | /api/v1/doctors/{doctorId} | Delete doctor |
 
 ---
 
 # Clinic Endpoints
 
-| Method | Endpoint                   | Description      |
-| ------ | -------------------------- | ---------------- |
-| POST   | /api/v1/clinics            | Create clinic    |
-| GET    | /api/v1/clinics/{clinicId} | Get clinic by id |
-| GET    | /api/v1/clinics            | Get all clinics  |
-| PUT    | /api/v1/clinics/{clinicId} | Update clinic    |
-| DELETE | /api/v1/clinics/{clinicId} | Delete clinic    |
+| Method | Endpoint | Description |
+|------|-----------|-------------|
+| POST | /api/v1/clinics | Create clinic |
+| GET | /api/v1/clinics/{clinicId} | Get clinic by id |
+| GET | /api/v1/clinics | Get all clinics |
+| PUT | /api/v1/clinics/{clinicId} | Update clinic |
+| DELETE | /api/v1/clinics/{clinicId} | Delete clinic |
 
 ---
 
 # Appointment Endpoints
 
-| Method | Endpoint                                      | Description          |
-| ------ | --------------------------------------------- | -------------------- |
-| POST   | /api/v1/appointments                          | Create appointment   |
-| GET    | /api/v1/appointments/{appointmentId}          | Get appointment      |
-| GET    | /api/v1/appointments                          | Get all appointments |
-| PUT    | /api/v1/appointments/{appointmentId}          | Update appointment   |
-| DELETE | /api/v1/appointments/{appointmentId}          | Delete appointment   |
-| PUT    | /api/v1/appointments/{appointmentId}/cancel   | Cancel appointment   |
-| PUT    | /api/v1/appointments/{appointmentId}/complete | Complete appointment |
+| Method | Endpoint | Description |
+|------|-----------|-------------|
+| POST | /api/v1/appointments | Create appointment |
+| GET | /api/v1/appointments/{appointmentId} | Get appointment |
+| GET | /api/v1/appointments | Get all appointments |
+| PUT | /api/v1/appointments/{appointmentId} | Update appointment |
+| DELETE | /api/v1/appointments/{appointmentId} | Delete appointment |
+| PUT | /api/v1/appointments/{appointmentId}/cancel | Cancel appointment |
+| PUT | /api/v1/appointments/{appointmentId}/complete | Complete appointment |
+
+---
+
+# Follow-Up Plan Endpoints
+
+| Method | Endpoint | Description |
+|------|-----------|-------------|
+| POST | /api/v1/follow-up-plans | Create follow-up plan |
+| GET | /api/v1/follow-up-plans/{followUpPlanId} | Get follow-up plan |
+| GET | /api/v1/follow-up-plans | Get all follow-up plans |
+| PUT | /api/v1/follow-up-plans/{followUpPlanId} | Update follow-up plan |
+| DELETE | /api/v1/follow-up-plans/{followUpPlanId} | Delete follow-up plan |
+| PUT | /api/v1/follow-up-plans/{followUpPlanId}/complete | Complete follow-up plan |
+| PUT | /api/v1/follow-up-plans/{followUpPlanId}/cancel | Cancel follow-up plan |
 
 ---
 
@@ -269,6 +284,8 @@ Examples:
 
 * AppointmentRequestModel
 * AppointmentResponseModel
+* AppointmentFollowUpPlanRequestModel
+* AppointmentFollowUpPlanResponseModel
 * PatientResponseModel
 * DoctorResponseModel
 * ClinicResponseModel
